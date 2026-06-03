@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BYU Roster</title>
+  <style>
+    :root {
+      --byu-blue: #002E5D;
+      --royal: #0062B8;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --border: #d8e0ea;
+      --text: #102033;
+      --muted: #627386;
+      --danger: #b42318;
+      --recruit-blue: #0062B8;
+      --reserve: #eef4fb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #eef4fb, #ffffff);
+      color: var(--text);
+    }
+
+    header {
+      background: var(--byu-blue);
+      color: white;
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: 0 4px 18px rgba(0,0,0,.18);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 42px;
+      letter-spacing: 1px;
+    }
+
+    .totals {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(150px, 1fr));
+      gap: 12px;
+      max-width: 950px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .total-box {
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.24);
+      border-radius: 14px;
+      padding: 10px;
+      font-weight: 800;
+    }
+
+    .total-box span {
+      display: block;
+      margin-top: 4px;
+      font-size: 20px;
+    }
+
+    .percentages {
+      margin: 10px auto 0;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(150px, 1fr));
+      gap: 10px;
+      max-width: 950px;
+    }
+
+    .percent-box {
+      background: rgba(255,255,255,.09);
+      border: 1px solid rgba(255,255,255,.20);
+      border-radius: 12px;
+      padding: 8px;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .percent-box span {
+      display: block;
+      margin-top: 3px;
+      font-size: 18px;
+    }
+
+    .wrap {
+      max-width: 1550px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .controls {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1.25fr .6fr .65fr .7fr .7fr .7fr .85fr auto;
+      gap: 12px;
+      align-items: end;
+      box-shadow: 0 8px 24px rgba(0,0,0,.06);
+      margin-bottom: 22px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    input, select, button {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 13px;
+      font-size: 15px;
+    }
+
+    button {
+      background: var(--byu-blue);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 800;
+      transition: .15s;
+      white-space: nowrap;
+    }
+
+    button:hover { background: var(--royal); transform: translateY(-1px); }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .position, .recruits-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.06);
+      overflow: hidden;
+    }
+
+    .position h2, .recruits-section h2 {
+      margin: 0;
+      padding: 16px;
+      background: var(--byu-blue);
+      color: white;
+      font-size: 18px;
+      text-align: center;
+    }
+
+    .slot-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin: 12px 12px 6px;
+      letter-spacing: .04em;
+    }
+
+    .dropzone {
+      min-height: 78px;
+      margin: 0 8px 8px;
+      padding: 5px;
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      background: #fbfdff;
+    }
+
+    .recruits-dropzone {
+      min-height: 180px;
+      padding: 14px;
+      background: var(--reserve);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      align-items: start;
+    }
+
+    .dropzone.dragover, .recruits-dropzone.dragover {
+      background: #e8f2ff;
+      outline: 3px dashed var(--royal);
+      outline-offset: -6px;
+    }
+
+    .empty {
+      color: #9aa8b6;
+      font-size: 13px;
+      text-align: center;
+      padding-top: 34px;
+      pointer-events: none;
+    }
+
+    .player {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--royal);
+      border-radius: 10px;
+      padding: 7px 8px;
+      margin-bottom: 4px;
+      cursor: grab;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+      line-height: 1.15;
+    }
+
+    .player.walkon-card {
+      background: #ffe5e5;
+      border-color: #d32f2f;
+      border-left: 5px solid #d32f2f;
+    }
+
+    .player.recruit-card {
+      background: #e8f2ff;
+      border-color: #0062B8;
+      border-left: 5px solid #0062B8;
+    }
+
+    .player:active { cursor: grabbing; }
+
+    .player-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+
+    .name {
+      font-size: 15px;
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }
+
+    .name.walkon { color: var(--danger); }
+    .name.recruit { color: var(--recruit-blue); }
+
+    .cost {
+      background: var(--byu-blue);
+      color: white;
+      border-radius: 999px;
+      padding: 3px 7px;
+      font-weight: 900;
+      min-width: 62px;
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 3px;
+      font-weight: 800;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cost-breakdown {
+      color: var(--text);
+      font-size: 10.5px;
+      margin-bottom: 4px;
+      background: rgba(255,255,255,.55);
+      border: 1px solid rgba(216,224,234,.75);
+      border-radius: 7px;
+      padding: 4px 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .player-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .small-input {
+      padding: 4px 5px;
+      border-radius: 7px;
+      font-size: 10px;
+      height: 25px;
+    }
+
+    .delete {
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid #f1b7b2;
+      padding: 4px 7px;
+      width: auto;
+      font-size: 10px;
+      height: 25px;
+    }
+
+    .delete:hover {
+      background: #fff1f0;
+      color: var(--danger);
+      transform: none;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 1350px) {
+      .board { grid-template-columns: repeat(2, 1fr); }
+      .controls { grid-template-columns: 1fr 1fr 1fr 1fr; }
+      .recruits-dropzone { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 760px) {
+      header h1 { font-size: 32px; }
+      .board, .controls, .recruits-dropzone, .totals, .percentages { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>BYU Roster</h1>
+    <div class="totals">
+      <div class="total-box">Rev <span id="revTotal">$0</span></div>
+      <div class="total-box">NIL <span id="nilTotal">$0</span></div>
+      <div class="total-box">Mali <span id="maliTotal">$0</span></div>
+      <div class="total-box">Overall Cost <span id="overallTotal">$0</span></div>
+    </div>
+
+    <div class="percentages">
+      <div class="percent-box">% of Rev <span id="revPercent">0%</span></div>
+      <div class="percent-box">% of NIL <span id="nilPercent">0%</span></div>
+      <div class="percent-box">Starter % <span id="starterPercent">0%</span></div>
+      <div class="percent-box">Bench % <span id="benchPercent">0%</span></div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="controls">
+      <div>
+        <label for="playerName">Player Name</label>
+        <input id="playerName" type="text" placeholder="Example: Player Name Recruit" />
+      </div>
+
+      <div>
+        <label for="playerHeight">Height</label>
+        <input id="playerHeight" type="text" placeholder="6'5&quot;" />
+      </div>
+
+      <div>
+        <label for="playerYear">Year</label>
+        <select id="playerYear">
+          <option value="5th">5th</option>
+          <option value="Sr">Sr</option>
+          <option value="Jr">Jr</option>
+          <option value="So">So</option>
+          <option value="Fr">Fr</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="playerRev">Rev</label>
+        <input id="playerRev" type="number" min="0" step="1000" placeholder="0" />
+      </div>
+
+      <div>
+        <label for="playerNil">NIL</label>
+        <input id="playerNil" type="number" min="0" step="1000" placeholder="0" />
+      </div>
+
+      <div>
+        <label for="playerMali">Mali</label>
+        <input id="playerMali" type="number" min="0" step="1000" placeholder="0" />
+      </div>
+
+      <div>
+        <label for="positionSelect">Starting Position</label>
+        <select id="positionSelect">
+          <option value="Point Guard">Point Guard</option>
+          <option value="Shooting Guard">Shooting Guard</option>
+          <option value="Small Forward">Small Forward</option>
+          <option value="Power Forward">Power Forward</option>
+          <option value="Center">Center</option>
+          <option value="Recruits">Recruits</option>
+        </select>
+      </div>
+
+      <button onclick="addPlayer()">Add Player</button>
+    </section>
+
+    <section class="board" id="board"></section>
+
+    <section class="recruits-section">
+      <h2>Recruits</h2>
+      <div class="recruits-dropzone" id="recruitsZone" data-position="Recruits" data-slot="Recruits"></div>
+    </section>
+
+    <p class="hint">Each position has four main spots. Drag any player into any position or into Recruits. Type “walk on” after a name to make it red. Type “recruit” after a name to make it blue. Your roster saves automatically in this browser.</p>
+  </main>
+
+  <script>
+    const positions = ["Point Guard", "Shooting Guard", "Small Forward", "Power Forward", "Center"];
+    const storageKey = "byuRosterPlayersV3";
+    let players = JSON.parse(localStorage.getItem(storageKey) || "[]");
+    let draggedId = null;
+
+    // Migrate older saved versions if V3 is empty.
+    if (!players.length) {
+      const oldV2 = JSON.parse(localStorage.getItem("byuRosterPlayersV2") || "[]");
+      if (oldV2.length) {
+        players = oldV2.map(p => ({
+          ...p,
+          position: p.position === "Reserve" ? "Recruits" : p.position,
+          slot: p.slot === "Reserve" ? "Recruits" : p.slot,
+          rev: Number(p.cost || 0),
+          nil: 0,
+          mali: 0,
+          recruit: false
+        }));
+        save();
+      }
+    }
+
+    function save() {
+      localStorage.setItem(storageKey, JSON.stringify(players));
+    }
+
+    function formatMoney(amount) {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 0
+      }).format(Number(amount || 0));
+    }
+
+    function renderBoard() {
+      const board = document.getElementById("board");
+      board.innerHTML = "";
+
+      positions.forEach(position => {
+        const col = document.createElement("div");
+        col.className = "position";
+
+        let slots = "";
+        for (let i = 1; i <= 4; i++) {
+          slots += `
+            <div class="slot-label">Spot ${i}</div>
+            <div class="dropzone" data-position="${position}" data-slot="${i}">
+              <div class="empty">Drop player here</div>
+            </div>
+          `;
+        }
+
+        col.innerHTML = `<h2>${position}</h2>${slots}`;
+        board.appendChild(col);
+      });
+
+      setupDropzones();
+      renderPlayers();
+    }
+
+    function setupDropzones() {
+      document.querySelectorAll(".dropzone, .recruits-dropzone").forEach(zone => {
+        zone.addEventListener("dragover", e => {
+          e.preventDefault();
+          zone.classList.add("dragover");
+        });
+
+        zone.addEventListener("dragleave", () => zone.classList.remove("dragover"));
+
+        zone.addEventListener("drop", e => {
+          e.preventDefault();
+          zone.classList.remove("dragover");
+
+          const newPosition = zone.dataset.position;
+          const newSlot = zone.dataset.slot;
+          const player = players.find(p => p.id === draggedId);
+          if (!player) return;
+
+          if (newPosition !== "Recruits") {
+            const spotTaken = players.some(p =>
+              p.id !== player.id &&
+              p.position === newPosition &&
+              String(p.slot) === String(newSlot)
+            );
+
+            if (spotTaken) {
+              alert("That spot is already filled. Move that player first or choose another spot.");
+              return;
+            }
+          }
+
+          player.position = newPosition;
+          player.slot = newPosition === "Recruits" ? "Recruits" : Number(newSlot);
+
+          save();
+          renderPlayers();
+        });
+      });
+    }
+
+    function renderPlayers() {
+      document.querySelectorAll(".dropzone").forEach(zone => {
+        zone.innerHTML = '<div class="empty">Drop player here</div>';
+      });
+
+      const recruitsZone = document.getElementById("recruitsZone");
+      recruitsZone.innerHTML = "";
+
+      players.forEach(player => {
+        const rev = Number(player.rev || 0);
+        const nil = Number(player.nil || 0);
+        const mali = Number(player.mali || 0);
+        const total = rev + nil + mali;
+
+        const card = document.createElement("div");
+        card.className = "player";
+
+        if (player.walkon) card.classList.add("walkon-card");
+        if (player.recruit) card.classList.add("recruit-card");
+        card.draggable = true;
+        card.dataset.id = player.id;
+
+        const nameClass = player.walkon ? "walkon" : player.recruit ? "recruit" : "";
+
+        card.innerHTML = `
+          <div class="player-top">
+            <div class="name ${nameClass}">${escapeHtml(player.name)}</div>
+            <div class="cost">${formatMoney(total)}</div>
+          </div>
+          <div class="meta">${escapeHtml(player.height || "-")} · ${escapeHtml(player.year || "-")}</div>
+          <div class="cost-breakdown">Rev ${formatMoney(rev)} · NIL ${formatMoney(nil)} · Mali ${formatMoney(mali)}</div>
+          <div class="player-actions">
+            <input class="small-input" title="Rev" type="number" min="0" step="1000" value="${rev}" onchange="updateMoney('${player.id}', 'rev', this.value)" />
+            <input class="small-input" title="NIL" type="number" min="0" step="1000" value="${nil}" onchange="updateMoney('${player.id}', 'nil', this.value)" />
+            <input class="small-input" title="Mali" type="number" min="0" step="1000" value="${mali}" onchange="updateMoney('${player.id}', 'mali', this.value)" />
+            <button class="delete" onclick="deletePlayer('${player.id}')">Delete</button>
+          </div>
+        `;
+
+        card.addEventListener("dragstart", () => {
+          draggedId = player.id;
+        });
+
+        if (player.position === "Recruits") {
+          recruitsZone.appendChild(card);
+        } else {
+          const zone = document.querySelector(`.dropzone[data-position="${cssEscape(player.position)}"][data-slot="${player.slot}"]`);
+          if (zone) {
+            zone.innerHTML = "";
+            zone.appendChild(card);
+          } else {
+            player.position = "Recruits";
+            player.slot = "Recruits";
+            recruitsZone.appendChild(card);
+          }
+        }
+      });
+
+      if (!recruitsZone.children.length) {
+        recruitsZone.innerHTML = '<div class="empty">Drop extra players and recruits here</div>';
+      }
+
+      updateTotals();
+      save();
+    }
+
+    function findFirstOpenSlot(position) {
+      for (let i = 1; i <= 4; i++) {
+        const taken = players.some(p => p.position === position && Number(p.slot) === i);
+        if (!taken) return i;
+      }
+      return null;
+    }
+
+    function cleanNameAndTags(rawName) {
+      let name = rawName.trim();
+
+      const walkon = /\bwalk\s*-?\s*on\b/i.test(name);
+      const recruit = /\brecruit\b/i.test(name);
+
+      name = name
+        .replace(/\bwalk\s*-?\s*on\b/gi, "")
+        .replace(/\brecruit\b/gi, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      return { name, walkon, recruit };
+    }
+
+    function addPlayer() {
+      const rawName = document.getElementById("playerName").value.trim();
+      const cleaned = cleanNameAndTags(rawName);
+      const name = cleaned.name;
+      const height = document.getElementById("playerHeight").value.trim();
+      const year = document.getElementById("playerYear").value;
+      const rev = Number(document.getElementById("playerRev").value || 0);
+      const nil = Number(document.getElementById("playerNil").value || 0);
+      const mali = Number(document.getElementById("playerMali").value || 0);
+
+      let position = document.getElementById("positionSelect").value;
+      let slot = "Recruits";
+
+      if (!rawName || !name) {
+        alert("Please enter a player name.");
+        return;
+      }
+
+      if (position !== "Recruits") {
+        const openSlot = findFirstOpenSlot(position);
+        if (openSlot) {
+          slot = openSlot;
+        } else {
+          position = "Recruits";
+          slot = "Recruits";
+          alert("That position already has four players. This player was added to Recruits.");
+        }
+      }
+
+      players.push({
+        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+        name,
+        height,
+        year,
+        rev,
+        nil,
+        mali,
+        walkon: cleaned.walkon,
+        recruit: cleaned.recruit,
+        position,
+        slot
+      });
+
+      document.getElementById("playerName").value = "";
+      document.getElementById("playerHeight").value = "";
+      document.getElementById("playerYear").value = "5th";
+      document.getElementById("playerRev").value = "";
+      document.getElementById("playerNil").value = "";
+      document.getElementById("playerMali").value = "";
+
+      save();
+      renderPlayers();
+    }
+
+    function updateMoney(id, field, value) {
+      const player = players.find(p => p.id === id);
+      if (player && ["rev", "nil", "mali"].includes(field)) {
+        player[field] = Number(value || 0);
+        save();
+        renderPlayers();
+      }
+    }
+
+    function deletePlayer(id) {
+      players = players.filter(p => p.id !== id);
+      save();
+      renderPlayers();
+    }
+
+    function formatPercent(value) {
+      if (!isFinite(value) || isNaN(value)) return "0%";
+      return `${value.toFixed(1)}%`;
+    }
+
+    function updateTotals() {
+      const activeRoster = players.filter(p => p.position !== "Recruits");
+
+      const rev = activeRoster.reduce((sum, p) => sum + Number(p.rev || 0), 0);
+      const nil = activeRoster.reduce((sum, p) => sum + Number(p.nil || 0), 0);
+      const mali = activeRoster.reduce((sum, p) => sum + Number(p.mali || 0), 0);
+      const overall = rev + nil + mali;
+
+      const revNilTotal = rev + nil;
+      const revPercent = revNilTotal > 0 ? (rev / revNilTotal) * 100 : 0;
+      const nilPercent = revNilTotal > 0 ? (nil / revNilTotal) * 100 : 0;
+
+      const starterCost = activeRoster
+        .filter(p => String(p.slot) === "1")
+        .reduce((sum, p) => sum + Number(p.rev || 0) + Number(p.nil || 0) + Number(p.mali || 0), 0);
+
+      const benchCost = activeRoster
+        .filter(p => String(p.slot) !== "1")
+        .reduce((sum, p) => sum + Number(p.rev || 0) + Number(p.nil || 0) + Number(p.mali || 0), 0);
+
+      const starterPercent = overall > 0 ? (starterCost / overall) * 100 : 0;
+      const benchPercent = overall > 0 ? (benchCost / overall) * 100 : 0;
+
+      document.getElementById("revTotal").textContent = formatMoney(rev);
+      document.getElementById("nilTotal").textContent = formatMoney(nil);
+      document.getElementById("maliTotal").textContent = formatMoney(mali);
+      document.getElementById("overallTotal").textContent = formatMoney(overall);
+
+      document.getElementById("revPercent").textContent = formatPercent(revPercent);
+      document.getElementById("nilPercent").textContent = formatPercent(nilPercent);
+      document.getElementById("starterPercent").textContent = formatPercent(starterPercent);
+      document.getElementById("benchPercent").textContent = formatPercent(benchPercent);
+    }
+
+    function escapeHtml(text) {
+      return String(text).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    function cssEscape(value) {
+      if (window.CSS && CSS.escape) return CSS.escape(value);
+      return String(value).replace(/"/g, '\\"');
+    }
+
+    renderBoard();
+  </script>
+</body>
+</html>
